@@ -71,6 +71,33 @@ describe OmniAuth::Strategies::LinkedIn do
     end
   end
 
+  describe '#credentials' do
+    let(:expires_in) { 3600 }
+    let(:expires_at) { 946688400 }
+    let(:token) { 'token' }
+    let(:refresh_token) { 'refresh_token' }
+    let(:refresh_token_expires_in) { 31536000 }
+    let(:access_token) do
+      instance_double OAuth2::AccessToken,
+        :expires_in => expires_in,
+        :expires_at => expires_at,
+        :token => token,
+        :refresh_token => refresh_token,
+        :params => {
+          "refresh_token_expires_in" => refresh_token_expires_in
+        }
+    end
+
+    before :each do
+      allow(subject).to receive(:oauth2_access_token).and_return access_token
+    end
+
+    specify { expect(subject.credentials["token"]).to eq token }
+    specify { expect(subject.credentials["refresh_token"]).to eq refresh_token }
+    specify { expect(subject.credentials["expires_at"]).to eq expires_at }
+    specify { expect(subject.credentials["refresh_token_expires_in"]).to eq refresh_token_expires_in }
+  end
+
   describe '#extra' do
     let(:raw_info) { Hash[:foo => 'bar'] }
 

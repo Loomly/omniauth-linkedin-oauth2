@@ -27,6 +27,15 @@ module OmniAuth
         }
       end
 
+      credentials do
+        hash = {"token" => access_token.token}
+        hash["refresh_token"] = access_token.refresh_token if access_token.expires? && access_token.refresh_token
+        hash["expires_at"] = access_token.expires_at if access_token.expires?
+        hash["expires"] = access_token.expires?
+        hash["refresh_token_expires_in"] = oauth2_access_token.params["refresh_token_expires_in"] if access_token.expires? && oauth2_access_token.params['refresh_token_expires_in']
+        hash
+      end
+
       extra do
         {
           'raw_info' => raw_info
